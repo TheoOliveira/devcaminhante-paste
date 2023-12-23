@@ -164,6 +164,7 @@ dependencies = [
 name = "devcaminhante-paste"
 version = "0.1.0"
 dependencies = [
+ "rand",
  "rocket",
 ]
 
