@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 use std::path::{Path, PathBuf};
-
+use rocket::request::FromParam;
 use rand::{self, Rng};
 
 pub struct PasteId<'a>(Cow<'a, str>);
@@ -24,4 +24,12 @@ impl PasteId<'_>{
     }
 }
 
-impl 
+impl<'a> FromParam<'a> for PasteId<'a> {
+    type Error = &'a str;
+
+    fn from_param(param: &'a str) -> Result<Self, Self::Error> {
+        param.chars().all(|c| c.is_ascii_alphabetic())
+        .then(|| PasteId(param.into()))
+        .ok_or(param)
+    }
+}
