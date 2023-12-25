@@ -8,3 +8,5 @@ edition = "2021"
 [dependencies]
 rocket = "0.5.0"
 rand = "0.8"
+shuttle-rocket = "0.35.0"
+shuttle-runtime = "0.35.0"
