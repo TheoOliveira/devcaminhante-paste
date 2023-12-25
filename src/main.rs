@@ -5,14 +5,12 @@ use rocket::http::uri::Absolute;
 mod paste_id;
 use paste_id::PasteId;
 
-#[derive(UrlDisplayPath)]
-pub struct PasteId<'a>(Cow<'a, str>);
 
 const ID_LENGTH: usize = 3;
 const HOST: Absolute<'static> = uri!("http://localhost:8000");
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount("/", routes![index, retrieve])
+    rocket::build().mount("/", routes![index, retrieve, upload])
 }
 
 #[get("/")]
