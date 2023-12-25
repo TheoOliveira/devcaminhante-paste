@@ -8,9 +8,11 @@ use paste_id::PasteId;
 
 const ID_LENGTH: usize = 3;
 const HOST: Absolute<'static> = uri!("http://localhost:8000");
-#[launch]
-fn rocket() -> _ {
-    rocket::build().mount("/", routes![index, retrieve, upload])
+#[shuttle_runtime::main]
+async fn main() -> shuttle_rocket::ShuttleRocket {
+    let rocket =  rocket::build().mount("/", routes![index, retrieve, upload]);
+
+    Ok(rocket.into())
 }
 
 #[get("/")]
