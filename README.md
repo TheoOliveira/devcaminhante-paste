@@ -11,8 +11,7 @@ Basically it's an api build using:
 
 
 ## TODO
-- Using Shuttle-persist instead of folder upload [here](https://docs.shuttle.rs/resources/shuttle-persist)
-
+- I need to use  Shuttle-persist instead of folder upload [here](https://docs.shuttle.rs/resources/shuttle-persist)
 - Visual Form to put the code  
 - Deletion route  
 -  Periodically deletes pastes (24hours)
