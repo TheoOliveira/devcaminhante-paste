@@ -182,6 +182,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "383d29d513d8764dcdc42ea295d979eb99c3c9f00607b3692cf68a431f7dca72"
 
 [[package]]
+name = "bincode"
+version = "1.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1f45e9417d87227c7a56d22e471c6206462cba514c7590c09aff4cf6d1ddcad"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "bitflags"
 version = "1.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -381,6 +390,7 @@ version = "0.1.0"
 dependencies = [
  "rand",
  "rocket",
+ "shuttle-persist",
  "shuttle-rocket",
  "shuttle-runtime",
 ]
@@ -1825,6 +1835,19 @@ dependencies = [
  "url",
  "uuid",
  "zeroize",
+]
+
+[[package]]
+name = "shuttle-persist"
+version = "0.35.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e6752dff13fb12e98bbf79fdcfc1555956f0ab48e3b53955cb35c4d94097c14d"
+dependencies = [
+ "async-trait",
+ "bincode",
+ "serde",
+ "shuttle-service",
+ "thiserror",
 ]
 
 [[package]]

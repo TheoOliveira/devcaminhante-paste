@@ -1,16 +1,27 @@
-#[macro_use] extern crate rocket;
-use rocket::tokio::fs::File;
+#[macro_use]
+extern crate rocket;
 use rocket::data::{Data, ToByteUnit};
 use rocket::http::uri::Absolute;
+use rocket::tokio::fs::File;
+use rocket::State;
 mod paste_id;
 use paste_id::PasteId;
-
+use shuttle_persist::PersistInstance;
 
 const ID_LENGTH: usize = 3;
 const HOST: Absolute<'static> = uri!("http://localhost:8000");
+
+struct MyState {
+    persist: PersistInstance,
+}
 #[shuttle_runtime::main]
-async fn main() -> shuttle_rocket::ShuttleRocket {
-    let rocket =  rocket::build().mount("/", routes![index, retrieve, upload]);
+async fn main(
+    #[shuttle_persist::Persist] persist: PersistInstance,
+) -> shuttle_rocket::ShuttleRocket {
+    let state = MyState { persist };
+    let rocket = rocket::build()
+        .mount("/", routes![index, retrieve, upload])
+        .manage(state);
 
     Ok(rocket.into())
 }
@@ -28,13 +39,17 @@ fn index() -> &'static str {
     "
 }
 #[get("/<id>")]
-async fn retrieve(id: PasteId<'_>) -> Option<File> {
-        File::open(id.file_path()).await.ok()        
-    }
+async fn retrieve(id: PasteId<'_>, state: &State<MyState>) -> Result<File> {
+    let file = state.persist.load(id);
+    File::open(file).await.ok()
+}
 
 #[post("/", data = "<paste>")]
 async fn upload(paste: Data<'_>) -> std::io::Result<String> {
     let id = PasteId::new(ID_LENGTH);
-    paste.open(128.kibibytes()).into_file(id.file_path()).await?;
+    paste
+        .open(128.kibibytes())
+        .into_file(id.file_path())
+        .await?;
     Ok(uri!(HOST, retrieve(id)).to_string())
 }
