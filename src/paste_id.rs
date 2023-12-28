@@ -1,13 +1,18 @@
+use rand::{self, Rng};
+use rocket::request::FromParam;
 use std::borrow::Cow;
 use std::path::{Path, PathBuf};
-use rocket::request::FromParam;
-use rand::{self, Rng};
 
 #[derive(UriDisplayPath)]
-pub struct PasteId<'a>(Cow<'a, str>);
+pub struct PasteId<'a>(pub Cow<'a, str>);
 
-impl PasteId<'_>{
-    pub fn new(size: usize) -> PasteId<'static>{
+impl<'a> ToString for PasteId<'a> {
+    fn to_string(&self) -> String {
+        self.0.to_string()
+    }
+}
+impl PasteId<'_> {
+    pub fn new(size: usize) -> PasteId<'static> {
         const BASE62: &[u8] = b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
         let mut id = String::with_capacity(size);
@@ -19,18 +24,20 @@ impl PasteId<'_>{
         PasteId(Cow::Owned(id))
     }
 
-    pub fn file_path(&self) -> PathBuf {
-        let root = concat!(env!("CARGO_MANIFEST_DIR"), "/", "upload");
-        Path::new(root).join(self.0.as_ref())
-    }
+    //pub fn file_path(&self) -> PathBuf {
+    //    let root = concat!(env!("CARGO_MANIFEST_DIR"), "/", "upload");
+    //    Path::new(root).join(self.0.as_ref())
+    //}
 }
 
 impl<'a> FromParam<'a> for PasteId<'a> {
     type Error = &'a str;
 
     fn from_param(param: &'a str) -> Result<Self, Self::Error> {
-        param.chars().all(|c| c.is_ascii_alphabetic())
-        .then(|| PasteId(param.into()))
-        .ok_or(param)
+        param
+            .chars()
+            .all(|c| c.is_ascii_alphabetic())
+            .then(|| PasteId(param.into()))
+            .ok_or(param)
     }
 }

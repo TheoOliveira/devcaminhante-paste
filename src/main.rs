@@ -1,7 +1,10 @@
 #[macro_use]
 extern crate rocket;
+use std::borrow::Cow;
+
 use rocket::data::{Data, ToByteUnit};
 use rocket::http::uri::Absolute;
+use rocket::response::status::BadRequest;
 use rocket::tokio::fs::File;
 use rocket::State;
 mod paste_id;
@@ -38,14 +41,24 @@ fn index() -> &'static str {
             retorna o conteúdo do paste com o id
     "
 }
+
 #[get("/<id>")]
-async fn retrieve(id: PasteId<'_>, state: &State<MyState>) -> Result<File> {
-    let file = state.persist.load(id);
-    File::open(file).await.ok()
+async fn retrieve(
+    id: PasteId<'_>,
+    state: &State<MyState>,
+) -> Result<Option<File>, BadRequest<String>> {
+    let str_id = id.to_string();
+    let converted_id: &str = &str_id;
+    let file = state
+        .persist
+        .load(converted_id)
+        .map_err(|e| BadRequest(e.to_string()))?;
+    //TODO: fix type on the return of the file
+    Ok(File::open(file).await.ok())
 }
 
 #[post("/", data = "<paste>")]
-async fn upload(paste: Data<'_>) -> std::io::Result<String> {
+async fn upload(paste: Data<'_>, state: &State<MyState>) -> std::io::Result<String> {
     let id = PasteId::new(ID_LENGTH);
     paste
         .open(128.kibibytes())
