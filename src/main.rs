@@ -1,7 +1,5 @@
 #[macro_use]
 extern crate rocket;
-use std::borrow::Cow;
-
 use rocket::data::{Data, ToByteUnit};
 use rocket::http::uri::Absolute;
 use rocket::response::status::BadRequest;
