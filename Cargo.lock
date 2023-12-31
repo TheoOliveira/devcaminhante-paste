@@ -390,6 +390,7 @@ version = "0.1.0"
 dependencies = [
  "rand",
  "rocket",
+ "serde",
  "shuttle-persist",
  "shuttle-rocket",
  "shuttle-runtime",
